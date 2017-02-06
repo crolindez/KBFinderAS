@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/fragment"
+   	android:layout_width="match_parent" 
+	android:layout_height="match_parent"
+	android:padding="3dp" >
+    <TextView style="?android:textAppearanceMedium"
+    	android:id="@+id/fragment_text"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+       	android:textSize="30sp"
+        android:textStyle="bold" 
+        android:textColor="#eeeeee"
+        android:text="" />	
+	<TextView
+       	android:id="@+id/song_name"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_centerVertical="true"
+       	android:layout_centerHorizontal="true"
+		android:maxLines="1"
+    	android:ellipsize="marquee"
+    	android:marqueeRepeatLimit="marquee_forever"
+    	android:scrollHorizontally="true"       
+       	android:textColor="#00ff00"
+       	android:textSize="30sp" />        
+	<ImageButton
+		android:id="@+id/play_pause_BT"
+		android:layout_width="64dp"
+		android:layout_height="64dp"
+		android:layout_centerHorizontal="true"
+        android:layout_below="@id/song_name"
+		android:layout_marginTop="10dp"	
+		android:layout_marginBottom="10dp"		
+		android:background="@drawable/play_pause_selector"
+		tools:ignore="ContentDescription" />
+   	<ImageButton
+        android:id="@+id/previous_BT"
+		android:layout_toLeftOf="@id/play_pause_BT"
+        android:layout_below="@id/song_name"
+		android:layout_marginTop="10dp"	
+        android:layout_width="64dp" 
+        android:layout_height="64dp" 
+		android:layout_marginBottom="10dp"		
+        android:background="@drawable/previous_selector"
+		tools:ignore="ContentDescription" />
+	<ImageButton
+		android:id="@+id/next_BT"
+		android:layout_width="64dp"
+		android:layout_height="64dp"
+		android:layout_toRightOf="@id/play_pause_BT"
+        android:layout_below="@id/song_name"	
+		android:layout_marginTop="10dp"	
+		android:layout_marginBottom="10dp"		
+		android:background="@drawable/next_selector"
+		tools:ignore="ContentDescription" />
+
+    
+</RelativeLayout>

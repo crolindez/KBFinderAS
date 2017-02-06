@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context="es.carlosrolindez.kbfinder.MainActivity" >
+	<item
+        android:id="@+id/bt_progress"
+        android:showAsAction="always"
+		android:actionViewClass="android.widget.ProgressBar"
+        android:title=""
+        android:visible="true"/>
+	
+</menu>
