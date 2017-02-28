@@ -1,6 +1,9 @@
 package es.carlosrolindez.bluetoothinterface;
 
+import android.bluetooth.BluetoothA2dp;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.IBluetoothA2dp;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,37 +14,50 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.IBinder;
 
+import java.util.List;
 
 
 public class BtA2dpConnectionManager {
     private static final String TAG = "BtA2dpConnectionManager";
     private static final String DEVICE_FILTER = "es.carlosrolindez.BtA2dpConnectionManager.Filter";
 
-    private Context mContextBTa2dp = null;
+    public enum BtA2dpEvent {CONNECTED, DISCONNECTED}
 
-    private boolean mBta2dpReceiverRegistered = false;
+    private Context mContextBtA2dp = null;
+
+    private boolean mBtA2dpReceiverRegistered = false;
     private boolean mBtA2dpIsBound = false;
     private IBluetoothA2dp iBtA2dp = null;
 
     private BluetoothDevice connectingDevice = null;
 
-    public BtA2dpConnectionManager(Context context) {
-        mContextBTa2dp = context;
+    private BtA2dpListener mBtA2dpListener = null;
+
+    public interface BtA2dpListener {
+        void notifyBtA2dpEvent(BluetoothDevice device, BtA2dpEvent event);
     }
 
+    public void setBtA2dpListener(BtA2dpListener listener) {
+        mBtA2dpListener = listener;
+    }
+    public BtA2dpConnectionManager(Context context) {
+        mContextBtA2dp = context;
+        BluetoothAdapter.getDefaultAdapter().getProfileProxy(mContextBtA2dp, mProfileListener, BluetoothProfile.A2DP);
+    }
 
     public void connectBluetoothA2dp(BluetoothDevice device) {
         connectingDevice = device;
 
-        if (!mBta2dpReceiverRegistered) {
+        if (!mBtA2dpReceiverRegistered) {
             IntentFilter filter1 = new IntentFilter(DEVICE_FILTER);
-            mContextBTa2dp.registerReceiver(mBtA2dpReceiver, filter1);
-            mBta2dpReceiverRegistered = true;
+            mContextBtA2dp.registerReceiver(mBtA2dpReceiver, filter1);
+            mBtA2dpReceiverRegistered = true;
         }
 
         Intent intent = new Intent(IBluetoothA2dp.class.getName());
         intent.setPackage("com.android.bluetooth");
-        mContextBTa2dp.bindService(intent, mBtA2dpServiceConnection, Context.BIND_AUTO_CREATE);
+        mContextBtA2dp.bindService(intent, mBtA2dpServiceConnection, Context.BIND_AUTO_CREATE);
+
     }
 
 
@@ -66,14 +82,14 @@ public class BtA2dpConnectionManager {
     private void sendA2dpConnection() {
         Intent intent = new Intent();
         intent.setAction(DEVICE_FILTER);
-        mContextBTa2dp.sendBroadcast(intent);
+        mContextBtA2dp.sendBroadcast(intent);
     }
 
 
     private void doUnbindServiceBtA2dp() {
         if (mBtA2dpIsBound) {
             try {
-                mContextBTa2dp.unbindService(mBtA2dpServiceConnection);
+                mContextBtA2dp.unbindService(mBtA2dpServiceConnection);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -84,9 +100,9 @@ public class BtA2dpConnectionManager {
 
 
     private void btA2dpDone() {
-        if (mBta2dpReceiverRegistered) {
-            mContextBTa2dp.unregisterReceiver(mBtA2dpReceiver);
-            mBta2dpReceiverRegistered = false;
+        if (mBtA2dpReceiverRegistered) {
+            mContextBtA2dp.unregisterReceiver(mBtA2dpReceiver);
+            mBtA2dpReceiverRegistered = false;
             doUnbindServiceBtA2dp();
         }
 
@@ -96,12 +112,36 @@ public class BtA2dpConnectionManager {
         btA2dpDone();
     }
 
+    private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
+
+        public void onServiceConnected(int profile, BluetoothProfile proxy) {
+            if (profile == BluetoothProfile.A2DP) {
+                BluetoothA2dp btA2dp = (BluetoothA2dp) proxy;
+                List<BluetoothDevice> a2dpConnectedDevices = btA2dp.getConnectedDevices();
+                if (a2dpConnectedDevices.size() != 0) {
+                    if (mBtA2dpListener != null) {
+                        for (BluetoothDevice device : a2dpConnectedDevices) {
+                            mBtA2dpListener.notifyBtA2dpEvent(device, BtA2dpEvent.CONNECTED);
+                        }
+
+                    }
+                }
+                BluetoothAdapter.getDefaultAdapter().closeProfileProxy(BluetoothProfile.A2DP, btA2dp);
+            }
+        }
+
+        public void onServiceDisconnected(int profile) {
+            if (profile == BluetoothProfile.A2DP) {
+                mBtA2dpListener.notifyBtA2dpEvent(null, BtA2dpEvent.DISCONNECTED);
+            }
+        }
+    };
 
     private final BroadcastReceiver mBtA2dpReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context arg0, Intent arg1) {
-            new connectA2dpTask().execute(/*conectingMAC*/);
+            new connectA2dpTask().execute();
         }
 
     };

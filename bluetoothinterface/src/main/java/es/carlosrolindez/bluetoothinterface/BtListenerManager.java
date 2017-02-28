@@ -1,9 +1,7 @@
 package es.carlosrolindez.bluetoothinterface;
 
-import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.IBluetooth;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -14,8 +12,6 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-
-import java.util.List;
 import java.util.Set;
 
 
@@ -111,11 +107,9 @@ public class BtListenerManager {
                         }
                         if (currentName == null)
                             currentName = device.getName();
-
                         mBtListener.addBtDevice(currentName, device);
                     }
 
-                    BluetoothAdapter.getDefaultAdapter().getProfileProxy(mContextBt, mProfileListener, BluetoothProfile.A2DP);
                 }
 
             }
@@ -164,37 +158,6 @@ public class BtListenerManager {
 
 
 
-	private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
-        public void onServiceConnected(int profile, BluetoothProfile proxy) {
-            if (profile == BluetoothProfile.A2DP) {
-                BluetoothA2dp btA2dp = (BluetoothA2dp) proxy;
-                List<BluetoothDevice> a2dpConnectedDevices = btA2dp.getConnectedDevices();
-                if (a2dpConnectedDevices.size() != 0) {
-                    if (mBtListener != null) {
-                        for (BluetoothDevice device : a2dpConnectedDevices) {
-                            String currentName = null; // = device.getName();
-                            try {
-                                currentName = iBt.getRemoteAlias(device);
-                            } catch (RemoteException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            if (currentName == null)
-                                currentName = device.getName();
-                            mBtListener.notifyBtEvent(device, BtEvent.CONNECTED);
-                        }
-
-                    }
-                }
-                BluetoothAdapter.getDefaultAdapter().closeProfileProxy(BluetoothProfile.A2DP, btA2dp);
-            }
-        }
-
-        public void onServiceDisconnected(int profile) {
-            if (profile == BluetoothProfile.A2DP) {
-            }
-        }
-    };
 
     private void doUnbindServiceBt() {
         if (mBtIsBound) {

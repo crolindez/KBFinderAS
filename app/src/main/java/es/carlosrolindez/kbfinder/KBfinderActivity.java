@@ -22,13 +22,14 @@ import es.carlosrolindez.bluetoothinterface.BtA2dpConnectionManager;
 import es.carlosrolindez.bluetoothinterface.BtA2dpDevice;
 import es.carlosrolindez.bluetoothinterface.BtListenerManager;
 
-public class KBfinderActivity extends Activity  implements BtListenerManager.BtListener{
+public class KBfinderActivity extends Activity  implements BtListenerManager.BtListener, BtA2dpConnectionManager.BtA2dpListener {
 	private static String TAG = "KBfinder";
     private static final String FILENAME = "settings.txt";
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BtListenerManager mBtListenerManager = null;
     private BtA2dpConnectionManager mBtA2DpConnectionManager = null;
+    private String a2dpMAC;
 
 	private final ArrayBTdevice deviceList = new ArrayBTdevice();
 	private KBdeviceListAdapter deviceListAdapter = null;
@@ -79,6 +80,7 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
         mBtListenerManager.setBtListener(this);
 
         mBtA2DpConnectionManager = new BtA2dpConnectionManager(getApplicationContext());
+        mBtA2DpConnectionManager.setBtA2dpListener(this);
 
         mListView = (ListView)findViewById(R.id.list);
         deviceListAdapter = new KBdeviceListAdapter(this, deviceList , mListView, mBtA2DpConnectionManager);
@@ -92,8 +94,9 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
 
                 if (device.mBtDevice.getBondState() != BluetoothDevice.BOND_BONDED)
                     device.mBtDevice.createBond();
-                else
+                else {
                     mBtA2DpConnectionManager.connectBluetoothA2dp(device.mBtDevice);
+                }
             }
         });
 
@@ -202,6 +205,11 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
             if (kbdevice.deviceMAC.equals(a2dpDevice.deviceMAC)) return;
 
         deviceList.addSorted(kbdevice);
+        if (a2dpMAC!=null) {
+            if (device.getAddress().equals(a2dpMAC)) {
+                kbdevice.connected = true;
+            }
+        }
 		deviceListAdapter.notifyDataSetChanged();
     }
 
@@ -272,6 +280,7 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
 
                     mBtA2DpConnectionManager.connectBluetoothA2dp(device);
 
+
                 } else if (KBdevice.getDeviceType(device.getAddress()) == KBdevice.SELECTBT) {
                     //disconnect current A2dp connection (if different to current device)
                     BluetoothDevice connectedDevice = null;
@@ -283,8 +292,9 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
                             break;
                         }
                     }
-                    if (connectedDevice!=null)
+                    if (connectedDevice!=null) {
                         mBtA2DpConnectionManager.connectBluetoothA2dp(device);
+                    }
 
                     Intent localIntent = new Intent (this, SelectBtActivity.class);
                     localIntent.putExtra(Constants.LAUNCH_MAC, device);
@@ -295,5 +305,34 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
         }
 
     }
+
+    public void notifyBtA2dpEvent(BluetoothDevice device, BtA2dpConnectionManager.BtA2dpEvent event) {
+        switch (event) {
+            case CONNECTED:
+                a2dpMAC = device.getAddress();
+                for (BtA2dpDevice listDevice : deviceList)
+                {
+                    if (device.getAddress().equals(listDevice.deviceMAC)) {
+                        listDevice.connected = true;
+                    } else {
+                        listDevice.connected = false;
+                    }
+                }
+                deviceListAdapter.notifyDataSetChanged();
+                break;
+
+            case DISCONNECTED:
+                a2dpMAC = null;
+                for (BtA2dpDevice listDevice : deviceList)
+                {
+                    listDevice.connected = false;
+                }
+                deviceListAdapter.notifyDataSetChanged();
+                break;
+
+        }
+
+    }
+
 
 }
