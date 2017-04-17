@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/KBFinder.iml" filepath="$PROJECT_DIR$/KBFinder.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bluetoothinterface/bluetoothinterface.iml" filepath="$PROJECT_DIR$/bluetoothinterface/bluetoothinterface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/btcomm/btcomm.iml" filepath="$PROJECT_DIR$/btcomm/btcomm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rfcomm/rfcomm.iml" filepath="$PROJECT_DIR$/rfcomm/rfcomm.iml" />
     </modules>
   </component>
 </project>

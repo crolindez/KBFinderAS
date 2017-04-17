@@ -1,1 +1,1 @@
-include ':app', ':bluetoothinterface'
+include ':app', ':bluetoothinterface', ':rfcomm', ':btcomm'

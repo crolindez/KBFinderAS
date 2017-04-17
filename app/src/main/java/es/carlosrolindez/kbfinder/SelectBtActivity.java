@@ -218,7 +218,7 @@ public class SelectBtActivity extends FragmentActivity implements DisconnectActi
 		mContext = this;
 		selectBtState = new SelectBtState(this);
 
-        mBtA2DpConnectionManager = new BtA2dpConnectionManager(getApplicationContext());
+        mBtA2DpConnectionManager = new BtA2dpConnectionManager(getApplicationContext(),null);
 
 		controlLayout = (RelativeLayout) findViewById(R.id.ControlLoyaut);
 		windowLayout = (RelativeLayout) findViewById(R.id.WindowLayout);

@@ -34,14 +34,11 @@ public class BtListenerManager {
         void notifyBtEvent(BluetoothDevice device, BtEvent event);
     }
 
-    public void setBtListener(BtListener listener) {
-        mBtListener = listener;
-    }
 
-
-    public BtListenerManager(Context context) {
+    public BtListenerManager(Context context,BtListener listener) {
 
         mContextBt = context;
+        mBtListener = listener;
     }
 
     public void searchBtDevices() {

@@ -76,11 +76,9 @@ public class KBfinderActivity extends Activity  implements BtListenerManager.BtL
     }
 
     private void startBtA2dpConnection() {
-        mBtListenerManager = new BtListenerManager(getApplicationContext());
-        mBtListenerManager.setBtListener(this);
+        mBtListenerManager = new BtListenerManager(getApplicationContext(),this);
 
-        mBtA2DpConnectionManager = new BtA2dpConnectionManager(getApplicationContext());
-        mBtA2DpConnectionManager.setBtA2dpListener(this);
+        mBtA2DpConnectionManager = new BtA2dpConnectionManager(getApplicationContext(), this);
 
         mListView = (ListView)findViewById(R.id.list);
         deviceListAdapter = new KBdeviceListAdapter(this, deviceList , mListView, mBtA2DpConnectionManager);

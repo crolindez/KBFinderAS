@@ -2,7 +2,7 @@
 <resources>
 	<string name="app_name">KBFinder</string>
 	<string name="clear_memories">Clear memories</string>
-	<string name="bt_not_availabe">Bluetooth is not available</string>
+	<string name="bt_not_available">Bluetooth is not available</string>
 	<string name="bt_not_enabled">Bluetooth is not enabled</string>
 	<string name="a2dp_connected">A2dp Connected</string>
 	<string name="a2dp_disconnected">A2dp Disconnected</string>

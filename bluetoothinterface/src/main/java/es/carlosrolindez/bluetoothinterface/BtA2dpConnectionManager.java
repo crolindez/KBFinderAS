@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.LauncherActivityInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 
@@ -37,11 +38,9 @@ public class BtA2dpConnectionManager {
         void notifyBtA2dpEvent(BluetoothDevice device, BtA2dpEvent event);
     }
 
-    public void setBtA2dpListener(BtA2dpListener listener) {
-        mBtA2dpListener = listener;
-    }
-    public BtA2dpConnectionManager(Context context) {
+    public BtA2dpConnectionManager(Context context,BtA2dpListener listener) {
         mContextBtA2dp = context;
+        mBtA2dpListener = listener;
         BluetoothAdapter.getDefaultAdapter().getProfileProxy(mContextBtA2dp, mProfileListener, BluetoothProfile.A2DP);
     }
 
@@ -56,6 +55,7 @@ public class BtA2dpConnectionManager {
 
         Intent intent = new Intent(IBluetoothA2dp.class.getName());
         intent.setPackage("com.android.bluetooth");
+  //      LauncherService.getInstance()
         mContextBtA2dp.bindService(intent, mBtA2dpServiceConnection, Context.BIND_AUTO_CREATE);
 
     }
@@ -69,6 +69,10 @@ public class BtA2dpConnectionManager {
             mBtA2dpIsBound = true;
             iBtA2dp = IBluetoothA2dp.Stub.asInterface(service);
             sendA2dpConnection();
+
+
+
+
         }
 
         @Override
@@ -115,6 +119,15 @@ public class BtA2dpConnectionManager {
     private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
 
         public void onServiceConnected(int profile, BluetoothProfile proxy) {
+            BluetoothA2dp a2dp = (BluetoothA2dp) proxy;
+ /*           try {
+                a2dp.getClass()
+                        .getMethod("connect",BluetoothDevice.class)
+                        .invoke(a2dp, connectingDevice);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+
             if (profile == BluetoothProfile.A2DP) {
                 BluetoothA2dp btA2dp = (BluetoothA2dp) proxy;
                 List<BluetoothDevice> a2dpConnectedDevices = btA2dp.getConnectedDevices();
@@ -123,7 +136,6 @@ public class BtA2dpConnectionManager {
                         for (BluetoothDevice device : a2dpConnectedDevices) {
                             mBtA2dpListener.notifyBtA2dpEvent(device, BtA2dpEvent.CONNECTED);
                         }
-
                     }
                 }
                 BluetoothAdapter.getDefaultAdapter().closeProfileProxy(BluetoothProfile.A2DP, btA2dp);
